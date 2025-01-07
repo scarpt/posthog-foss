@@ -52,6 +52,10 @@ services:
             service: kafka
         depends_on:
             - zookeeper
+        environment:
+            KAFKA_LOG_RETENTION_MS: 3600000
+            KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+            KAFKA_LOG_RETENTION_HOURS: 1
         volumes:
             - kafka-data:/bitnami/kafka
 
@@ -89,6 +93,7 @@ services:
             ENCRYPTION_SALT_KEYS: $ENCRYPTION_SALT_KEYS
             DISABLE_SECURE_SSL_REDIRECT: 'true'  # Because Nginx handles SSL
             IS_BEHIND_PROXY: 'true'
+            TRUST_ALL_PROXIES: True
         networks:
             - default
         expose:
