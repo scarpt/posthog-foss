@@ -82,7 +82,7 @@ services:
             service: worker
         environment:
             SENTRY_DSN: 'https://public@sentry.example.com/1'
-            SITE_URL: https://posthog.5.75.139.153.sslip.io:8000
+            SITE_URL: https://posthog.sharpi.ai  
             SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             OBJECT_STORAGE_ACCESS_KEY_ID: 'object_storage_root_user'
             OBJECT_STORAGE_SECRET_ACCESS_KEY: 'object_storage_root_password'
@@ -95,25 +95,24 @@ services:
             file: docker-compose.base.yml
             service: web
         command: /compose/start
-        ports:
-            - 8000:8000
-            - 8001:8001
         volumes:
             - ./compose:/compose
         image: posthog/posthog-foss:latest
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.posthog.rule=Host(`posthog.5.75.139.153.sslip.io`)"
-            - "traefik.http.services.posthog.loadbalancer.server.port=8000"
         environment:
             SENTRY_DSN: 'https://public@sentry.example.com/1'
-            SITE_URL: https://posthog.5.75.139.153.sslip.io:8000
+            SITE_URL: https://posthog.sharpi.ai  
             SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             OBJECT_STORAGE_ACCESS_KEY_ID: 'object_storage_root_user'
             OBJECT_STORAGE_SECRET_ACCESS_KEY: 'object_storage_root_password'
             OBJECT_STORAGE_ENDPOINT: http://objectstorage:19000
             OBJECT_STORAGE_ENABLED: true
             ENCRYPTION_SALT_KEYS: 692e0ccdca87ab0c5d6ebc5e566de512a9038c40ef2c7fc26c995f7da07cc039
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.posthog.rule=Host(`posthog.sharpi.ai`)"
+            - "traefik.http.routers.posthog.entrypoints=websecure"
+            - "traefik.http.routers.posthog.tls.certresolver=letsencrypt"
+            - "traefik.http.services.posthog.loadbalancer.server.port=8000"
         depends_on:
             - db
             - redis
@@ -128,7 +127,7 @@ services:
         image: posthog/posthog-foss:latest
         environment:
             SENTRY_DSN: 'https://public@sentry.example.com/1'
-            SITE_URL: https://posthog.5.75.139.153.sslip.io:8000
+            SITE_URL: https://posthog.sharpi.ai  
             SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             OBJECT_STORAGE_ACCESS_KEY_ID: 'object_storage_root_user'
             OBJECT_STORAGE_SECRET_ACCESS_KEY: 'object_storage_root_password'
@@ -152,7 +151,7 @@ services:
         image: posthog/posthog-foss:latest
         environment:
             SENTRY_DSN: 'https://public@sentry.example.com/1'
-            SITE_URL: https://posthog.5.75.139.153.sslip.io:8000
+            SITE_URL: https://posthog.sharpi.ai  
             SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             SKIP_ASYNC_MIGRATIONS_SETUP: 0
 
@@ -198,7 +197,7 @@ services:
         image: posthog/posthog-foss:latest
         environment:
             SENTRY_DSN: 'https://public@sentry.example.com/1'
-            SITE_URL: https://posthog.5.75.139.153.sslip.io:8000
+            SITE_URL: https://posthog.sharpi.ai  
             SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
         depends_on:
             - db
@@ -218,3 +217,8 @@ volumes:
     redis-data:
     redis7-data:
     kafka-data:
+
+networks:
+    default:
+    coolify-network:
+        external: true
