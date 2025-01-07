@@ -9,6 +9,13 @@
 #
 
 services:
+    objectstorage:
+        extends:
+            file: docker-compose.base.yml
+            service: objectstorage
+        volumes:
+            - objectstorage:/data
+
     db:
         extends:
             file: docker-compose.base.yml
@@ -37,9 +44,7 @@ services:
         # Note: please keep the default version in sync across
         #       `posthog` and the `charts-clickhouse` repos
         #
-        extends:
-            file: docker-compose.base.yml
-            service: clickhouse
+        image: clickhouse/clickhouse-server:22.3.4.20
         restart: on-failure
         depends_on:
             - kafka
@@ -76,32 +81,35 @@ services:
             file: docker-compose.base.yml
             service: worker
         environment:
-            SENTRY_DSN: $SENTRY_DSN
-            SITE_URL: https://$DOMAIN
-            SECRET_KEY: $POSTHOG_SECRET
+            SENTRY_DSN: 'https://public@sentry.example.com/1'
+            SITE_URL: https://localhost:8000
+            SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             OBJECT_STORAGE_ACCESS_KEY_ID: 'object_storage_root_user'
             OBJECT_STORAGE_SECRET_ACCESS_KEY: 'object_storage_root_password'
             OBJECT_STORAGE_ENDPOINT: http://objectstorage:19000
             OBJECT_STORAGE_ENABLED: true
-            ENCRYPTION_SALT_KEYS: $ENCRYPTION_SALT_KEYS
-        image: $REGISTRY_URL:$POSTHOG_APP_TAG
+            ENCRYPTION_SALT_KEYS: 692e0ccdca87ab0c5d6ebc5e566de512a9038c40ef2c7fc26c995f7da07cc039
+        image: posthog/posthog-foss:latest
     web:
         extends:
             file: docker-compose.base.yml
             service: web
         command: /compose/start
+        ports:
+            - 8000:8000
+            - 8001:8001
         volumes:
             - ./compose:/compose
-        image: $REGISTRY_URL:$POSTHOG_APP_TAG
+        image: posthog/posthog-foss:latest
         environment:
-            SENTRY_DSN: $SENTRY_DSN
-            SITE_URL: https://$DOMAIN
-            SECRET_KEY: $POSTHOG_SECRET
+            SENTRY_DSN: 'https://public@sentry.example.com/1'
+            SITE_URL: https://localhost:8000
+            SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             OBJECT_STORAGE_ACCESS_KEY_ID: 'object_storage_root_user'
             OBJECT_STORAGE_SECRET_ACCESS_KEY: 'object_storage_root_password'
             OBJECT_STORAGE_ENDPOINT: http://objectstorage:19000
             OBJECT_STORAGE_ENABLED: true
-            ENCRYPTION_SALT_KEYS: $ENCRYPTION_SALT_KEYS
+            ENCRYPTION_SALT_KEYS: 692e0ccdca87ab0c5d6ebc5e566de512a9038c40ef2c7fc26c995f7da07cc039
         depends_on:
             - db
             - redis
@@ -113,18 +121,18 @@ services:
         extends:
             file: docker-compose.base.yml
             service: plugins
-        image: $REGISTRY_URL:$POSTHOG_APP_TAG
+        image: posthog/posthog-foss:latest
         environment:
-            SENTRY_DSN: $SENTRY_DSN
-            SITE_URL: https://$DOMAIN
-            SECRET_KEY: $POSTHOG_SECRET
+            SENTRY_DSN: 'https://public@sentry.example.com/1'
+            SITE_URL: https://localhost:8000
+            SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             OBJECT_STORAGE_ACCESS_KEY_ID: 'object_storage_root_user'
             OBJECT_STORAGE_SECRET_ACCESS_KEY: 'object_storage_root_password'
             OBJECT_STORAGE_ENDPOINT: http://objectstorage:19000
             OBJECT_STORAGE_ENABLED: true
             CDP_REDIS_HOST: redis7
             CDP_REDIS_PORT: 6379
-            ENCRYPTION_SALT_KEYS: $ENCRYPTION_SALT_KEYS
+            ENCRYPTION_SALT_KEYS: 692e0ccdca87ab0c5d6ebc5e566de512a9038c40ef2c7fc26c995f7da07cc039
         depends_on:
             - db
             - redis
@@ -133,38 +141,15 @@ services:
             - kafka
             - objectstorage
 
-    caddy:
-        image: caddy:2.6.1
-        restart: unless-stopped
-        ports:
-            - '80:80'
-            - '443:443'
-        volumes:
-            - ./Caddyfile:/etc/caddy/Caddyfile
-            - caddy-data:/data
-            - caddy-config:/config
-        depends_on:
-            - web
-    objectstorage:
-        extends:
-            file: docker-compose.base.yml
-            service: objectstorage
-        restart: on-failure
-        volumes:
-            - objectstorage:/data
-        ports:
-            - '19000:19000'
-            - '19001:19001'
-
     asyncmigrationscheck:
         extends:
             file: docker-compose.base.yml
             service: asyncmigrationscheck
-        image: $REGISTRY_URL:$POSTHOG_APP_TAG
+        image: posthog/posthog-foss:latest
         environment:
-            SENTRY_DSN: $SENTRY_DSN
-            SITE_URL: https://$DOMAIN
-            SECRET_KEY: $POSTHOG_SECRET
+            SENTRY_DSN: 'https://public@sentry.example.com/1'
+            SITE_URL: https://localhost:8000
+            SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
             SKIP_ASYNC_MIGRATIONS_SETUP: 0
 
     # Temporal containers
@@ -206,11 +191,11 @@ services:
             service: temporal-django-worker
         volumes:
             - ./compose:/compose
-        image: $REGISTRY_URL:$POSTHOG_APP_TAG
+        image: posthog/posthog-foss:latest
         environment:
-            SENTRY_DSN: $SENTRY_DSN
-            SITE_URL: https://$DOMAIN
-            SECRET_KEY: $POSTHOG_SECRET
+            SENTRY_DSN: 'https://public@sentry.example.com/1'
+            SITE_URL: https://localhost:8000
+            SECRET_KEY: 0d4eebbee4f47f369a009acf99f5316c7709680eeccc4aa32e610671
         depends_on:
             - db
             - redis
@@ -226,8 +211,6 @@ volumes:
     objectstorage:
     postgres-data:
     clickhouse-data:
-    caddy-data:
-    caddy-config:
     redis-data:
     redis7-data:
     kafka-data:

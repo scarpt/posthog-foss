@@ -25,16 +25,20 @@
     <keep_alive_timeout>3</keep_alive_timeout>
 
     <openSSL>
-        <server>
-            <certificateFile>/etc/clickhouse-server/server.crt</certificateFile>
-            <privateKeyFile>/etc/clickhouse-server/server.key</privateKeyFile>
-            <dhParamsFile>/etc/clickhouse-server/dhparam.pem</dhParamsFile>
-            <verificationMode>none</verificationMode>
-            <loadDefaultCAFile>true</loadDefaultCAFile>
-            <cacheSessions>true</cacheSessions>
-            <disableProtocols>sslv2,sslv3</disableProtocols>
-            <preferServerCiphers>true</preferServerCiphers>
-        </server>
+		<server>
+			<certificateFile remove="1"/>
+			<privateKeyFile remove="1"/>
+			<!--	
+				<certificateFile>/etc/clickhouse-server/server.crt</certificateFile>
+				<privateKeyFile>/etc/clickhouse-server/server.key</privateKeyFile>
+				<dhParamsFile>/etc/clickhouse-server/dhparam.pem</dhParamsFile>
+				<verificationMode>none</verificationMode>
+				<loadDefaultCAFile>true</loadDefaultCAFile>
+				<cacheSessions>true</cacheSessions>
+				<disableProtocols>sslv2,sslv3</disableProtocols>
+				<preferServerCiphers>true</preferServerCiphers>
+			-->
+			</server>
 
         <client>
             <loadDefaultCAFile>true</loadDefaultCAFile>
